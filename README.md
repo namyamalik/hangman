@@ -3,10 +3,9 @@
 
 #### To-Do
 * Space for allocation in arrays
-* print some filler (success, fail)
-* limited number of lives	
-* ctrl-D gives long output
+* limited number of lives and print if failiure
+* ctrl-D gives long output, account for EOF
 * memory leaks
 * divide functions into different files?
 * comment
-* have an array of letters already been guessed (so user can keep track of incorrect guesses)
+* graphics

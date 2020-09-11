@@ -20,7 +20,7 @@
 void validate_arguments(int argc, char* argv[]);
 char* choose_word(char* argv[]);
 int* length_info(char* word_chosen);
-bool player_guess(char* word_chosen, int* p, bool solved);
+bool player_guess(char* word_chosen, int* p, bool solved, int num_incorrect_guesses);
 bool validate_user_guess(char character[]);
 
 /**************** main ****************/
@@ -32,8 +32,9 @@ int main(int argc, char* argv[]) {
 
 	int* p = length_info(word_chosen); // print dashes & return array of zeros corresponding to length word chosen
 	bool solved = false;
+	int num_incorrect_guesses = 0;
 	while (!solved) { // while word remains unsolved, let player guess again
-		solved = player_guess(word_chosen, p, solved);
+		solved = player_guess(word_chosen, p, solved, num_incorrect_guesses);
 	}
 	
 	return 0;
@@ -161,9 +162,10 @@ int* length_info(char* word_chosen) {
  *
  * Returns a boolean whether word has been solved (if array is filled with all ones and no zeros)
  */
-bool player_guess(char* word_chosen, int* p, bool solved) {
+bool player_guess(char* word_chosen, int* p, bool solved, int num_incorrect_guesses) {
 	char character[100];
-	
+	char letters_guessed_array[27];
+
 	// let user enter a guess and read from stdin
 	printf("Enter your guess: ");
 	fscanf(stdin, "%s", character);
@@ -173,6 +175,7 @@ bool player_guess(char* word_chosen, int* p, bool solved) {
 	
 		bool changed = false;
 		bool already = false;
+		bool incorrect_again = false;
 
 		// check if user's guess matches a letter in the chosen word
 		for (int i = 0; i < strlen(word_chosen); i++) {
@@ -195,7 +198,18 @@ bool player_guess(char* word_chosen, int* p, bool solved) {
 			printf("This letter has already been filled in\n");
 		}
 		else {
-			printf("Incorrect guess\n");
+			for (int i = 0; i < strlen(letters_guessed_array); i++) {
+				if (letters_guessed_array[i] == character[0]) {
+					printf("You already guessed this incorrect letter\n");
+					incorrect_again = true;
+					break;
+				}
+			}
+			if (!incorrect_again) {
+				printf("Incorrect guess\n");
+				letters_guessed_array[num_incorrect_guesses] = character[0];
+				num_incorrect_guesses++;
+			}
 		}
 
 	}	
@@ -223,6 +237,7 @@ bool player_guess(char* word_chosen, int* p, bool solved) {
 		}
 	}
 	solved = true;
+	printf("Success! You guessed the word!\n");
 	return solved;
 }
 
