@@ -16,36 +16,52 @@
 #include <time.h>
 #include <stdbool.h>
 
+/**************** constants ****************/
+#define MAX_LIVES 5
+
+
 /**************** local functions ****************/
+void hangman(int argc, char* argv[]);
 void validate_arguments(int argc, char* argv[]);
 char* choose_word(char* argv[]);
-int* length_info(char* word_chosen);
+int* print_before_guess(char* word_chosen);
 void player_guess(char* word_chosen, int* p, bool* solved, int* num_incorrect_guesses);
 bool validate_user_guess(char character[]);
+void print_word_filled(char* word_chosen, int* p);
+void check_solved(char* word_chosen, int* p, bool* solved);
+
 
 /**************** main ****************/
 int main(int argc, char* argv[]) {
-	
-	validate_arguments(argc, argv); // check arguments
+	validate_arguments(argc, argv); // check arguments before game begins
+	hangman(argc, argv);
+	return 0;
+}	
+
+
+/**************** hangman ****************/
+/*
+ * Primary Hangman function that calls several other functions to play the game
+ *
+ * Void return
+ */
+void hangman(int argc, char* argv[]) {
 	char* word_chosen = choose_word(argv); // randomly choose word from txt file
 	printf("word chosen is %s\n", word_chosen);
 
-	int* p = length_info(word_chosen); // print dashes & return array of zeros corresponding to length word chosen
+	int* p = print_before_guess(word_chosen); // print dashes & return array of zeros corresponding to length word chosen
+	
 	bool solved = false;
 	int num_incorrect_guesses = 0;
 	
 	// let user guess again while word remains unsolved and lives remain
-	while (!solved && num_incorrect_guesses < 5) {
+	while (!solved && num_incorrect_guesses < MAX_LIVES) {
 		player_guess(word_chosen, p, &solved, &num_incorrect_guesses);
 		//printf("num is %d\n", num_incorrect_guesses);
 		//printf("solved is %d\n", solved);
 	}
-	//if (num_incorrect_guesses >= 5) {
-	//	printf("\nGame Over. You ran out of lives.\n\n");
-	//}
 	
 	free(p);
-	return 0;
 }
 
 
@@ -75,8 +91,7 @@ void validate_arguments(int argc, char* argv[]) {
 
 /**************** choose_word ****************/
 /* 
- * Scans the words of a text file into an array and then randomly chooses one of
- * those words
+ * Scans the words of a text file into an array and then randomly chooses one of those words
  *
  * Returns the word chosen
  */
@@ -115,7 +130,7 @@ char* choose_word(char* argv[]) {
     	//}
 		//printf("%d %s\n", num_words, word_copy);
 		
-		free(word_copy);
+		//free(word_copy);
 	}
 	fclose(fp);
 
@@ -139,13 +154,13 @@ char* choose_word(char* argv[]) {
 }
 
 
-/**************** length_info ****************/
+/**************** print_before_guess ****************/
 /*
  * Prints out a dash (in Hangman style) for each letter of the chosen word
  *
- * Returns an array of zeros. Length of array is the length of the word chosen ( * each zero corresponds to a letter of the chosen word)
+ * Returns an array of zeros. Length of array is the length of the word chosen (each zero corresponds to a letter of the chosen word)
  */
-int* length_info(char* word_chosen) {
+int* print_before_guess(char* word_chosen) {
 	// print word but with all the letters replaced with dashes
 	printf("\nWord: ");
 	for (int i = 0; i < strlen(word_chosen); i++) {
@@ -166,9 +181,9 @@ int* length_info(char* word_chosen) {
 
 /**************** player_guess ****************/
 /*
- * Lets user guess a letter. Changes the corresponding element in the array of zeros to a one if user's guess was correct. Then prints out the dashes again but fills in a letter if the user's guess was correct.
+ * Lets user guess a letter and calls a fxn to validate the user's guess. Changes the corresponding element in the array of zeros to a one if user's guess was correct and prints out correct/incorrect/lives statements. Calls a fxn to print out the updated word (with letters and dashes). Calls a fxn to check if word has been solved.
  *
- * Returns a boolean whether word has been solved (if array is filled with all ones and no zeros)
+ * Void return
  */
 void player_guess(char* word_chosen, int* p, bool* solved, int* num_incorrect_guesses) {
 	char character[200];
@@ -179,7 +194,7 @@ void player_guess(char* word_chosen, int* p, bool* solved, int* num_incorrect_gu
 	printf("Enter your guess: ");
 	fscanf(stdin, "%s", character);
 
-	// validate user's guess
+	// if user's entry is a single alphabet then proceed
 	if (validate_user_guess(character)) {
 	
 		bool changed = false;
@@ -198,37 +213,52 @@ void player_guess(char* word_chosen, int* p, bool* solved, int* num_incorrect_gu
 				}
 			}
 		}
+		
+		// print correct/incorrect/lives statements
+        if (changed) {
+            printf("Correct guess\n");
+            printf("Lives remaining: %d\n", MAX_LIVES - *num_incorrect_guesses);
+        }
+        else if (already) {
+            printf("This letter has already been filled in\n");
+            printf("Lives remaining: %d\n", MAX_LIVES - *num_incorrect_guesses);
+        }
+        else {
+            for (int i = 0; i < strlen(letters_guessed_array); i++) {
+                printf("%c\n", letters_guessed_array[i]);
+                if (letters_guessed_array[i] == character[0]) {
+                    printf("You already guessed this incorrect letter\n");
+                    printf("Lives remaining: %d\n", MAX_LIVES - *num_incorrect_guesses);
+                    incorrect_again = true;
+                    break;
+                }
+            }
+            if (!incorrect_again) {
+                printf("Incorrect guess\n");
+                letters_guessed_array[*num_incorrect_guesses] = character[0];
+                (*num_incorrect_guesses)++;
+                printf("Lives remaining: %d\n", MAX_LIVES - *num_incorrect_guesses);
+            }
+        }
+		
+		// if lives remain then print updated word and check if it has been solved
+		if (*num_incorrect_guesses < MAX_LIVES) {
+			print_word_filled(word_chosen, p);
+			check_solved(word_chosen, p, solved);
+			return;
+		}
+		printf("\nGame Over. You ran out of lives. The word was '%s'.\n\n", word_chosen); // no lives remain
+	}
+}
 
-		// print correct/incorrect statments
-		if (changed) {
-			printf("Correct guess\n");
-			printf("Lives remaining: %d\n", 5 - *num_incorrect_guesses);
-		}
-		else if (already) {
-			printf("This letter has already been filled in\n");
-			printf("Lives remaining: %d\n", 5 - *num_incorrect_guesses);
-		}
-		else {
-			for (int i = 0; i < strlen(letters_guessed_array); i++) {
-				printf("%c\n", letters_guessed_array[i]);
-				if (letters_guessed_array[i] == character[0]) {
-					printf("You already guessed this incorrect letter\n");
-					printf("Lives remaining: %d\n", 5 - *num_incorrect_guesses);
-					incorrect_again = true;
-					break;
-				}
-			}
-			if (!incorrect_again) {
-				printf("Incorrect guess\n");
-				letters_guessed_array[*num_incorrect_guesses] = character[0];
-				(*num_incorrect_guesses)++;
-				printf("Lives remaining: %d\n", 5 - *num_incorrect_guesses); 
-			}
-		}
-	}	
-	
-	// print the word with dashes/letters after user's guess if lives remain
-	if (*num_incorrect_guesses < 5) {
+
+/**************** print_word_filled ****************/
+/*
+ * Prints the chosen word with dashes/letters after user's guess (replaces a dash with a letter upon a successful guess)
+ *
+ * Void return
+ */
+void print_word_filled(char* word_chosen, int* p) {
 		printf("\nWord: ");
 		for (int b = 0; b < strlen(word_chosen); b++) {
 			// print a dash if letter has not been guessed 
@@ -241,25 +271,28 @@ void player_guess(char* word_chosen, int* p, bool* solved, int* num_incorrect_gu
 			}
 		}
 		printf("\n");
-	}
+}
 
-	// check if the word has been solved or not
+
+/**************** check_solved ****************/
+/*
+ * Checks whether user has guessed all the letters in the chosen word
+ *
+ * Void return
+ */
+void check_solved(char* word_chosen, int* p, bool* solved) {
 	for (int j = 0; j < strlen(word_chosen); j++) {
 		// if array contains zero then word has not been solved
 		if (p[j] == 0) {
 			*solved = false;
-			
-			if (*num_incorrect_guesses >= 5) {
-        		printf("\nGame Over. You ran out of lives.\n\n");
-    		}
-			
 			return;
 		}
 	}
+	// if array contains no zeros then word has been solved
 	*solved = true;
 	printf("\nSuccess! You guessed the word!\n\n");
-
 }
+
 
 /**************** validate_user_guess ****************/
 /*
@@ -270,15 +303,19 @@ void player_guess(char* word_chosen, int* p, bool* solved, int* num_incorrect_gu
 bool validate_user_guess(char character[]) {
 	// check length of user's guess
 	if (strlen(character) > 1) {
-        printf("Please provide a single alphabetic letter as your guess\n");
+        printf("Please provide a single alphabetic letter as your guess\n\n");
         return false;
     }
 	// if length is 1 then check if it is alphabetic
     else {
         if (isalpha(character[0]) == 0) {
-        	printf("Please provide a single alphabetic letter as your guess\n");
+        	printf("Please provide a single alphabetic letter as your guess\n\n");
           	return false;
        	}
+    }
+	// if entry is valid then normalize the entry to lowercase (in case user provided uppercase letter)
+    if(character[0] >= 65 && character[0] <= 90) {
+            character[0] = character[0] + 32;
     }
     return true;
 }
