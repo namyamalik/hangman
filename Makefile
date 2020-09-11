@@ -11,10 +11,13 @@ MAKE = make
 $(PROG): $(OBJS)
 	$(CC) $(CFLAGS) $^ $(LIBS) -o $@
 
-.PHONY: test clean
+.PHONY: test valgrind clean
 
 test: $(PROG)
 	./$(PROG) words.txt
+
+valgrind: $(PROG)
+	valgrind --leak-check=full --show-leak-kinds=all ./$(PROG) words.txt
 
 clean:
 	rm -f *~ *.o *.dSYM
