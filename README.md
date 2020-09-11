@@ -1,19 +1,19 @@
-### Hangman
-### Author: Namya Malik
+## Hangman README.md
+## Author: Namya Malik
 
-#### To-Do
+### To-Do
 * ctrl-D gives long output, account for EOF
 * memory leaks
 * comment and clean up code (DEBUGGING STATMENTS)
 * testing and readme and implementation/design
 
-#### Compilation
+### Compilation
 
-#### Playing the Game
+### Playing the Game
 
 ### Rules
 
-#### Assumptions
+### Assumptions
 * Text file has one word per line
 * Text file contains words with alphabetic characters only
 * Each word in the text file is less than 200 characters long
@@ -21,8 +21,8 @@
 
 * User inputs a guess that is less than 200 characters long
 
-#### Non-Assumptions
+### Non-Assumptions
 * User may type in lowercase or uppercase alphabets, the program will treat them as identical
 
-#### Potential Next Steps
+### Potential Next Steps
 * Graphics
