@@ -47,7 +47,9 @@ int main(int argc, char* argv[]) {
  */
 void hangman(int argc, char* argv[]) {
 	char* word_chosen = choose_word(argv); // randomly choose word from txt file
-	printf("word chosen is %s\n", word_chosen);
+	#ifdef UNITTESTING
+		printf("word chosen is %s\n", word_chosen);	
+	#endif
 
 	int* p = print_before_guess(word_chosen); // print dashes & return array of zeros corresponding to length word chosen
 	
@@ -57,9 +59,11 @@ void hangman(int argc, char* argv[]) {
 	// let user guess again while word remains unsolved and lives remain
 	while (!solved && num_incorrect_guesses < MAX_LIVES) {
 		player_guess(word_chosen, p, &solved, &num_incorrect_guesses);
-		//printf("num is %d\n", num_incorrect_guesses);
-		//printf("solved is %d\n", solved);
 	}
+
+	#ifdef UNITTESTING
+        printf("game finished\n");
+    #endif
 	
 	free(p);
 }
@@ -172,7 +176,6 @@ int* print_before_guess(char* word_chosen) {
 	int* guess_array = malloc((strlen(word_chosen) + 1) * sizeof(int));
 	for (int j = 0; j < strlen(word_chosen); j++) {
 		guess_array[j] = 0;
-		//printf("%d\n", guess_array[j]);
 	}
 
 	return guess_array;
@@ -192,9 +195,13 @@ void player_guess(char* word_chosen, int* p, bool* solved, int* num_incorrect_gu
 
 	// let user enter a guess and read from stdin
 	printf("Enter your guess: ");
-	fscanf(stdin, "%s", character);
+	if (fscanf(stdin, "%s", character) == EOF) {
+		clearerr(stdin);
+		printf("\n\n");
+		return;
+	}
 
-	// if user's entry is a single alphabet then proceed
+	// if user's entry is valid then proceed
 	if (validate_user_guess(character)) {
 	
 		bool changed = false;
@@ -225,7 +232,6 @@ void player_guess(char* word_chosen, int* p, bool* solved, int* num_incorrect_gu
         }
         else {
             for (int i = 0; i < strlen(letters_guessed_array); i++) {
-                printf("%c\n", letters_guessed_array[i]);
                 if (letters_guessed_array[i] == character[0]) {
                     printf("You already guessed this incorrect letter\n");
                     printf("Lives remaining: %d\n", MAX_LIVES - *num_incorrect_guesses);

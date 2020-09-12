@@ -2,16 +2,29 @@
 ## Author: Namya Malik
 
 ### To-Do
-* ctrl-D gives long output, account for EOF
+* quit game, normalize "quit"
 * memory leaks
-* comment and clean up code (DEBUGGING STATMENTS)
+* comment and clean up code
 * testing and readme and implementation/design
 
 ### Compilation
+`make` will compile the `hangman` executable
 
 ### Playing the Game
+`make test` will start the game
 
 ### Rules
+* Single player game
+* Goal is for the player to guess a word that has been randomly chosen from a list of words
+* Player must guess a single letter on each turn
+* Player has 5 "lives" (number of incorrect guesses allowed)
+* Player can type "quit" to exit the game at any point
+
+### Exit Status
+0 - success
+1 -
+2 - 
+3 -
 
 ### Assumptions
 * Text file has one word per line
