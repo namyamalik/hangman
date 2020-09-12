@@ -20,7 +20,7 @@ test: $(PROG)
 	./$(PROG) words.txt
 
 valgrind: $(PROG)
-	valgrind --leak-check=full --show-leak-kinds=all ./$(PROG) words.txt
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./$(PROG) words.txt
 
 clean:
 	rm -f *~ *.o *.dSYM

@@ -26,14 +26,19 @@ void validate_arguments(int argc, char* argv[]);
 char* choose_word(char* argv[]);
 int* print_before_guess(char* word_chosen);
 void player_guess(char* word_chosen, int* p, bool* solved, int* num_incorrect_guesses);
-bool validate_user_guess(char character[]);
+bool validate_user_guess(char character[], bool *solved);
 void print_word_filled(char* word_chosen, int* p);
 void check_solved(char* word_chosen, int* p, bool* solved);
 
 
 /**************** main ****************/
+/*
+ * Validates command-line arguments and calls the primary hangman fxn
+ *
+ * Returns zero upon successful completion of program
+ */
 int main(int argc, char* argv[]) {
-	validate_arguments(argc, argv); // check arguments before game begins
+	validate_arguments(argc, argv); // check command-line arguments before game begins
 	hangman(argc, argv);
 	return 0;
 }	
@@ -105,55 +110,40 @@ char* choose_word(char* argv[]) {
 		fprintf(stderr, "Error allocating memory");
 		exit(3);
 	}
+	
 	char** word_array = malloc(1000 * sizeof(char*));
 	if (word_array == NULL) {
         fprintf(stderr, "Error allocating memory");
-        free(word);
+    	free(word);
 		exit(3);
     }
 	int num_words = 0;
-	char* word_copy = NULL;	
 
 	// open file and scan for each word
 	FILE* fp = fopen(argv[1], "r");
 	while (fscanf(fp, "%s", word) == 1) {
-		word_copy = malloc((strlen(word) + 1) * sizeof(char));
-		if (word_copy == NULL) {
-            fprintf(stderr, "Error allocating memory");
-            free(word);
-            free(word_array);
-            exit(3);
-        }
-
-		strcpy(word_copy, word);
-		word_array[num_words] = word_copy; // add each word to an array
-		//printf("%d %s\n", num_words, word_array[num_words]);
+		word_array[num_words] = word; // add each word to an array
+	//	printf("%d %s %s\n", num_words, word_array[num_words], word);
 		num_words++;
-		//if (word_copy != NULL) {
-        //	free(word_copy);
-    	//}
-		//printf("%d %s\n", num_words, word_copy);
-		
-		//free(word_copy);
 	}
 	fclose(fp);
-
-	//for (int i = 0; i < num_words; i++) {
-    //        printf("%d %s\n", i, word_array[i]);
-   // }
 
 	// choose random word from array
 	srand(time(NULL)); // so that different index generated each time
 	int random_index = rand() % num_words; // index 0-11
 	
 	char* word_chosen = word_array[random_index];
-	if (word != NULL) {
-		free(word);
-	}
+	printf("WORD IS %s\n", word_chosen);
+	
+	//if (word != NULL) {
+	//	free(word);
+	//}
+	
 	if (word_array != NULL) {
 		free(word_array);
 	}
-	    // free(word_copy);
+	
+	printf("WORD IS %s\n", word_chosen);
 	return word_chosen;
 }
 
@@ -190,7 +180,9 @@ int* print_before_guess(char* word_chosen) {
  */
 void player_guess(char* word_chosen, int* p, bool* solved, int* num_incorrect_guesses) {
 	char character[200];
-	char letters_guessed_array[*num_incorrect_guesses + 1];
+
+	char letters_guessed_array[500];
+	//char letters_guessed_array[*num_incorrect_guesses + 1] = {"z"};
 	//char* letters_guessed_array = malloc(*num_incorrect_guesses * sizeof(char));
 
 	// let user enter a guess and read from stdin
@@ -202,8 +194,8 @@ void player_guess(char* word_chosen, int* p, bool* solved, int* num_incorrect_gu
 	}
 
 	// if user's entry is valid then proceed
-	if (validate_user_guess(character)) {
-	
+	if (validate_user_guess(character, solved)) {
+
 		bool changed = false;
 		bool already = false;
 		bool incorrect_again = false;
@@ -231,8 +223,9 @@ void player_guess(char* word_chosen, int* p, bool* solved, int* num_incorrect_gu
             printf("Lives remaining: %d\n", MAX_LIVES - *num_incorrect_guesses);
         }
         else {
-            for (int i = 0; i < strlen(letters_guessed_array); i++) {
-                if (letters_guessed_array[i] == character[0]) {
+            for (int z = 0; z < strlen(letters_guessed_array); z++) {
+                printf("%ld\n", strlen(letters_guessed_array));
+				if (letters_guessed_array[z] == character[0]) {
                     printf("You already guessed this incorrect letter\n");
                     printf("Lives remaining: %d\n", MAX_LIVES - *num_incorrect_guesses);
                     incorrect_again = true;
@@ -241,6 +234,7 @@ void player_guess(char* word_chosen, int* p, bool* solved, int* num_incorrect_gu
             }
             if (!incorrect_again) {
                 printf("Incorrect guess\n");
+				//printf("%c\n", letters_guessed_array[*num_incorrect_guesses]); 
                 letters_guessed_array[*num_incorrect_guesses] = character[0];
                 (*num_incorrect_guesses)++;
                 printf("Lives remaining: %d\n", MAX_LIVES - *num_incorrect_guesses);
@@ -302,16 +296,31 @@ void check_solved(char* word_chosen, int* p, bool* solved) {
 
 /**************** validate_user_guess ****************/
 /*
- * Checks whether user provided a single alphabetic character as their guess
+ * Normalizes user's entry to all lowercase. Checks whether user provided a single alphabetic character as their guess. Also checks whether user typed 'quit' and ends the game accordingly.
  *
  * Returns a boolean whether user provided valid guess
  */
-bool validate_user_guess(char character[]) {
+bool validate_user_guess(char character[], bool* solved) {
+	
+	// normalize the entry to lowercase (in case user provided uppercase letter)
+    for (int i = 0; i < strlen(character); i++) {
+		if (character[i] >= 65 && character[i] <= 90) {
+            character[i] = character[i] + 32;
+    	}
+	}	
+
 	// check length of user's guess
 	if (strlen(character) > 1) {
-        printf("Please provide a single alphabetic letter as your guess\n\n");
+		// end game if user typed quit
+		if (strcmp(character, "quit") == 0) {
+			*solved = true;
+			printf("\nGame ended. You quit the game.\n\n");
+			return false;
+		}
+		printf("Please provide a single alphabetic letter as your guess\n\n");
         return false;
     }
+
 	// if length is 1 then check if it is alphabetic
     else {
         if (isalpha(character[0]) == 0) {
@@ -319,9 +328,5 @@ bool validate_user_guess(char character[]) {
           	return false;
        	}
     }
-	// if entry is valid then normalize the entry to lowercase (in case user provided uppercase letter)
-    if(character[0] >= 65 && character[0] <= 90) {
-            character[0] = character[0] + 32;
-    }
-    return true;
+	return true;
 }
