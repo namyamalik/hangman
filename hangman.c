@@ -1,8 +1,6 @@
 /*
  * hangman.c
- * 
  * Author: Namya Malik
- * 
  * September 2020
  *
  */
@@ -17,7 +15,7 @@
 #include <stdbool.h>
 
 /**************** constants ****************/
-#define MAX_LIVES 5
+const int MAX_LIVES = 5;
 
 /**************** local functions ****************/
 void hangman(int argc, char* argv[]);
@@ -30,13 +28,15 @@ void print_word_filled(char* word_chosen, int* zeros_array);
 void check_solved(char* word_chosen, int* zeros_array, bool* solved);
 char* normalize_word(char* word);
 
+
 /**************** main ****************/
 /*
  * Validates command-line arguments and calls the primary hangman fxn
  *
  * Returns zero upon successful completion of program
  */
-int main(int argc, char* argv[]) {
+int main(int argc, char* argv[]) 
+{
 	validate_arguments(argc, argv); // check command-line arguments before game begins
 	hangman(argc, argv);
 	return 0;
@@ -49,8 +49,8 @@ int main(int argc, char* argv[]) {
  *
  * Void return
  */
-void hangman(int argc, char* argv[]) {
-	
+void hangman(int argc, char* argv[]) 
+{
 	// randomly choose word from txt file
 	char* word_chosen = choose_word(argv);
 	#ifdef UNITTESTING
@@ -86,8 +86,8 @@ void hangman(int argc, char* argv[]) {
  *
  * Void return
  */
-void validate_arguments(int argc, char* argv[]) {
-	
+void validate_arguments(int argc, char* argv[]) 
+{
 	// if user provides incorrect number of  arguments
     if (argc != 2) {
         fprintf(stderr, "Error: incorrect number of arguments provided - please provide 1 argument for correct usage\n");
@@ -110,7 +110,8 @@ void validate_arguments(int argc, char* argv[]) {
  *
  * Returns the word chosen
  */
-char* choose_word(char* argv[]) {
+char* choose_word(char* argv[]) 
+{
 	char word[200]; // store each character of a word (max 200 letters in word)
 	char* word_array[1000]; // store each word (max 1000 in file)
 	int num_words = 0;
@@ -159,7 +160,8 @@ char* choose_word(char* argv[]) {
  *
  * Returns an array of zeros. Length of array is the length of the word chosen (each zero corresponds to a letter of the chosen word)
  */
-int* print_before_guess(char* word_chosen) {
+int* print_before_guess(char* word_chosen) 
+{
 	// print word but with all the letters replaced with dashes
 	printf("\nWord: ");
 	for (int i = 0; i < strlen(word_chosen); i++) {
@@ -183,7 +185,8 @@ int* print_before_guess(char* word_chosen) {
  *
  * Void return
  */
-void player_guess(char* word_chosen, int* zeros_array, bool* solved, int* num_incorrect_guesses, char incorrect_letters_array[]) {
+void player_guess(char* word_chosen, int* zeros_array, bool* solved, int* num_incorrect_guesses, char incorrect_letters_array[]) 
+{
 	char character[200] = " "; // to store user input, initialize to avoid valgrind errors
 
 	// let user enter a guess and read from stdin
@@ -259,7 +262,8 @@ void player_guess(char* word_chosen, int* zeros_array, bool* solved, int* num_in
  *
  * Void return
  */
-void print_word_filled(char* word_chosen, int* zeros_array) {
+void print_word_filled(char* word_chosen, int* zeros_array) 
+{
 		printf("\nWord: ");
 		for (int i = 0; i < strlen(word_chosen); i++) {
 			// print a dash if letter has not been guessed 
@@ -281,7 +285,8 @@ void print_word_filled(char* word_chosen, int* zeros_array) {
  *
  * Void return
  */
-void check_solved(char* word_chosen, int* zeros_array, bool* solved) {
+void check_solved(char* word_chosen, int* zeros_array, bool* solved) 
+{
 	for (int i = 0; i < strlen(word_chosen); i++) {
 		// if zeros_array contains zero then word has not been solved
 		if (zeros_array[i] == 0) {
@@ -301,8 +306,8 @@ void check_solved(char* word_chosen, int* zeros_array, bool* solved) {
  *
  * Returns a boolean whether user provided valid guess
  */
-bool validate_user_guess(char character[], bool* solved) {
-	
+bool validate_user_guess(char character[], bool* solved) 
+{
 	// normalize the entry to lowercase (in case user provided uppercase letter)
 	char* word_normalized = normalize_word(character);
 
@@ -334,7 +339,8 @@ bool validate_user_guess(char character[], bool* solved) {
  *
  * Returns the normalized word
  */
-char* normalize_word(char* word) {
+char* normalize_word(char* word) 
+{
 	for (int i = 0; i < strlen(word); i++) {
         if (word[i] >= 65 && word[i] <= 90) {
             word[i] = word[i] + 32;

@@ -1,5 +1,6 @@
 # Makefile for 'hangman'
 # Author: Namya Malik
+# September 2020
 
 PROG = hangman
 OBJS = hangman.o
