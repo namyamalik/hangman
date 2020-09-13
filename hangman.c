@@ -25,7 +25,7 @@ void hangman(int argc, char* argv[]);
 void validate_arguments(int argc, char* argv[]);
 char* choose_word(char* argv[]);
 int* print_before_guess(char* word_chosen);
-void player_guess(char* word_chosen, int* p, bool* solved, int* num_incorrect_guesses);
+void player_guess(char* word_chosen, int* p, bool* solved, int* num_incorrect_guesses, char letters_guessed_array[]);
 bool validate_user_guess(char character[], bool *solved);
 void print_word_filled(char* word_chosen, int* p);
 void check_solved(char* word_chosen, int* p, bool* solved);
@@ -60,10 +60,11 @@ void hangman(int argc, char* argv[]) {
 	
 	bool solved = false;
 	int num_incorrect_guesses = 0;
+	char letters_guessed_array[26] = " "; // 26 letters in alphabet, must initialize to avoid valgrind errors
 	
 	// let user guess again while word remains unsolved and lives remain
 	while (!solved && num_incorrect_guesses < MAX_LIVES) {
-		player_guess(word_chosen, p, &solved, &num_incorrect_guesses);
+		player_guess(word_chosen, p, &solved, &num_incorrect_guesses, letters_guessed_array);
 	}
 
 	#ifdef UNITTESTING
@@ -178,10 +179,9 @@ int* print_before_guess(char* word_chosen) {
  *
  * Void return
  */
-void player_guess(char* word_chosen, int* p, bool* solved, int* num_incorrect_guesses) {
+void player_guess(char* word_chosen, int* p, bool* solved, int* num_incorrect_guesses, char letters_guessed_array[]) {
 	char character[200] = " ";
 
-	char letters_guessed_array[500];
 	//char letters_guessed_array[*num_incorrect_guesses + 1];
 	//char* letters_guessed_array = malloc(*num_incorrect_guesses * sizeof(char));
 
@@ -224,7 +224,6 @@ void player_guess(char* word_chosen, int* p, bool* solved, int* num_incorrect_gu
         }
         else {
             for (int z = 0; z < strlen(letters_guessed_array); z++) {
-                //printf("%ld\n", strlen(letters_guessed_array));
 				if (letters_guessed_array[z] == character[0]) {
                     printf("You already guessed this incorrect letter\n");
                     printf("Lives remaining: %d\n", MAX_LIVES - *num_incorrect_guesses);
@@ -234,8 +233,7 @@ void player_guess(char* word_chosen, int* p, bool* solved, int* num_incorrect_gu
             }
             if (!incorrect_again) {
                 printf("Incorrect guess\n");
-				//printf("%c\n", letters_guessed_array[*num_incorrect_guesses]); 
-                letters_guessed_array[*num_incorrect_guesses] = character[0];
+                letters_guessed_array[*num_incorrect_guesses] = character[0]; // could also use strncmp to append a character to the letters_guessed_array string
                 (*num_incorrect_guesses)++;
                 printf("Lives remaining: %d\n", MAX_LIVES - *num_incorrect_guesses);
             }

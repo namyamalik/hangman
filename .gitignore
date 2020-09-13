@@ -2,3 +2,4 @@ core
 a.out
 hangman
 *.o
+vgcore*
