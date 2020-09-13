@@ -1,17 +1,12 @@
 ## Hangman README.md
 ## Author: Namya Malik
 
-### To-Do
-* valgrind warning
-* defensive coding: parameter null checking, use assertp?
-* comment and clean up code
-
 ### Compilation
 `make` compiles the `hangman` executable
 
 ### Usage
 * Executes from a command line with usage syntax: `./hangman filename`
-* `make test` runs this above command and starts the game
+* `make test` runs this above command (using `words.txt` as `filename`) and starts the game
 * `make clean` removes object files and the executable
 * `make valgrind` tests for memory leaks
 

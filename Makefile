@@ -7,7 +7,7 @@ OBJS = hangman.o
 # uncomment the following to turn on progress-testing print messages
 # UNITTESTING=-DTESTPROGRESS
 
-CFLAGS = -Wall -pedantic -std=c11 -ggdb $(TESTING)
+CFLAGS = -Wall -pedantic -std=c11 -ggdb $(UNITTESTING)
 CC = gcc
 MAKE = make
 
