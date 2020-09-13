@@ -2,9 +2,8 @@
 ## Author: Namya Malik
 
 ### To-Do
-* memory leaks
+* valgrind warning
 * defensive coding: parameter null checking, use assertp?
-* test assumptions
 * comment and clean up code
 
 ### Compilation
@@ -24,20 +23,21 @@
 * Player can type "quit" to exit the game at any point
 
 ### Assumptions
-* `filename` has one word per line
-* `filename` contains words with alphabetic characters only
+* `filename` contains words with alphabetic characters only (since user can only guess alphabetic letters)
 * Each word in `filename` is less than 200 characters long
-* There are less than 1000 words to scan in `filename` (aka 1000 lines since there is 1 word per line)
+* There are less than 1000 total words to scan in `filename`
 * User inputs a guess that is less than 200 characters long
 
 ### Non-Assumptions
+* `filename` may be formatted in different ways as long as each word is separated by a whitespace character
+* `filename` words may be lowercase or uppercase alphabets, the program will treat them as identical
 * User may type in lowercase or uppercase alphabets, the program will treat them as identical
 
 ### Exit Status
-0 - success
-1 - incorrect number of command-line arguments provided
-2 - `filename` is not readable
-3 -  error allocating memory
+0 - success  
+1 - incorrect number of command-line arguments provided  
+2 - `filename` is not readable  
+3 -  error allocating memory  
 
 ### Potential Next Steps
 * Graphics

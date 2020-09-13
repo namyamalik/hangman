@@ -1,12 +1,6 @@
-computer
-science
-dartmouth
-unix
-apple
-microsoft
-amazon
-google
+computer EYE SCIENCE dartmouth
+UNIX apple
+microsoft AMAZON google
 technology
-engineering
+ENGINEERING
 coding
-programming

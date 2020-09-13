@@ -29,7 +29,7 @@ void player_guess(char* word_chosen, int* p, bool* solved, int* num_incorrect_gu
 bool validate_user_guess(char character[], bool *solved);
 void print_word_filled(char* word_chosen, int* p);
 void check_solved(char* word_chosen, int* p, bool* solved);
-
+char* normalize_word(char* word);
 
 /**************** main ****************/
 /*
@@ -118,7 +118,8 @@ char* choose_word(char* argv[]) {
     		fprintf(stderr, "Error allocating memory");
     		exit(3);
     	}
-		strcpy(word_array[num_words], word); // add each word to an array
+		char* word_normalized = normalize_word(word);
+		strcpy(word_array[num_words], word_normalized); // add each word to an array
 		num_words++;
 	}
 	fclose(fp);
@@ -295,23 +296,19 @@ void check_solved(char* word_chosen, int* p, bool* solved) {
 
 /**************** validate_user_guess ****************/
 /*
- * Normalizes user's entry to all lowercase. Checks whether user provided a single alphabetic character as their guess. Also checks whether user typed 'quit' and ends the game accordingly.
+ * Calls fxn to normalize user's entry to lowercase. Checks whether user provided a single alphabetic character as their guess. Also checks whether user typed 'quit' and ends the game accordingly.
  *
  * Returns a boolean whether user provided valid guess
  */
 bool validate_user_guess(char character[], bool* solved) {
 	
 	// normalize the entry to lowercase (in case user provided uppercase letter)
-    for (int i = 0; i < strlen(character); i++) {
-		if (character[i] >= 65 && character[i] <= 90) {
-            character[i] = character[i] + 32;
-    	}
-	}	
+	char* word_normalized = normalize_word(character);
 
 	// check length of user's guess
-	if (strlen(character) > 1) {
+	if (strlen(word_normalized) > 1) {
 		// end game if user typed quit
-		if (strcmp(character, "quit") == 0) {
+		if (strcmp(word_normalized, "quit") == 0) {
 			*solved = true;
 			printf("\nGame ended. You quit the game.\n\n");
 			return false;
@@ -322,10 +319,25 @@ bool validate_user_guess(char character[], bool* solved) {
 
 	// if length is 1 then check if it is alphabetic
     else {
-        if (isalpha(character[0]) == 0) {
+        if (isalpha(word_normalized[0]) == 0) {
         	printf("Please provide a single alphabetic letter as your guess\n\n");
           	return false;
        	}
     }
 	return true;
+}
+
+/**************** normalize_word ****************/
+/*
+ * Normalizes a word to all lowercase
+ *
+ * Returns the normalized word
+ */
+char* normalize_word(char* word) {
+	for (int i = 0; i < strlen(word); i++) {
+        if (word[i] >= 65 && word[i] <= 90) {
+            word[i] = word[i] + 32;
+        }
+    }
+	return word;
 }
