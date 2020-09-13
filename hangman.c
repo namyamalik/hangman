@@ -70,6 +70,7 @@ void hangman(int argc, char* argv[]) {
         printf("game finished\n");
     #endif
 	
+	free(word_chosen);
 	free(p);
 }
 
@@ -105,46 +106,44 @@ void validate_arguments(int argc, char* argv[]) {
  * Returns the word chosen
  */
 char* choose_word(char* argv[]) {
-	char* word = malloc(200 * sizeof(char));
-	if (word == NULL) {
-		fprintf(stderr, "Error allocating memory");
-		exit(3);
-	}
-	
-	char** word_array = malloc(1000 * sizeof(char*));
-	if (word_array == NULL) {
-        fprintf(stderr, "Error allocating memory");
-    	free(word);
-		exit(3);
-    }
+	char word[200];
+	char* word_array[1000];
 	int num_words = 0;
 
 	// open file and scan for each word
 	FILE* fp = fopen(argv[1], "r");
-	while (fscanf(fp, "%s", word) == 1) {
-		word_array[num_words] = word; // add each word to an array
-	//	printf("%d %s %s\n", num_words, word_array[num_words], word);
+	while (fscanf(fp, "%s", word) != EOF) {
+		word_array[num_words] = malloc(strlen(word) + 1);
+		if (word_array[num_words] == NULL) {
+    		fprintf(stderr, "Error allocating memory");
+    		exit(3);
+    	}
+		strcpy(word_array[num_words], word); // add each word to an array
 		num_words++;
 	}
 	fclose(fp);
-
+	
 	// choose random word from array
 	srand(time(NULL)); // so that different index generated each time
 	int random_index = rand() % num_words; // index 0-11
-	
 	char* word_chosen = word_array[random_index];
-	printf("WORD IS %s\n", word_chosen);
 	
-	//if (word != NULL) {
-	//	free(word);
-	//}
-	
-	if (word_array != NULL) {
-		free(word_array);
-	}
-	
-	printf("WORD IS %s\n", word_chosen);
-	return word_chosen;
+	// copy word_chosen into a separate variable so it doesn't get lost when word_array slots are freed
+	char* word_chosen_copy = malloc(strlen(word_chosen) + 1);
+	if (word_chosen_copy == NULL) {
+		fprintf(stderr, "Error allocating memory");
+        exit(3);	
+	}	
+	strcpy(word_chosen_copy, word_chosen);
+
+	// free slots of word_array
+	for (int i = 0; i < num_words; i++) {
+        if (word_array[i] != NULL) {
+			free(word_array[i]);
+		}	
+    }
+
+	return word_chosen_copy; // this will get freed at the end of program
 }
 
 
@@ -179,10 +178,10 @@ int* print_before_guess(char* word_chosen) {
  * Void return
  */
 void player_guess(char* word_chosen, int* p, bool* solved, int* num_incorrect_guesses) {
-	char character[200];
+	char character[200] = " ";
 
 	char letters_guessed_array[500];
-	//char letters_guessed_array[*num_incorrect_guesses + 1] = {"z"};
+	//char letters_guessed_array[*num_incorrect_guesses + 1];
 	//char* letters_guessed_array = malloc(*num_incorrect_guesses * sizeof(char));
 
 	// let user enter a guess and read from stdin
@@ -224,7 +223,7 @@ void player_guess(char* word_chosen, int* p, bool* solved, int* num_incorrect_gu
         }
         else {
             for (int z = 0; z < strlen(letters_guessed_array); z++) {
-                printf("%ld\n", strlen(letters_guessed_array));
+                //printf("%ld\n", strlen(letters_guessed_array));
 				if (letters_guessed_array[z] == character[0]) {
                     printf("You already guessed this incorrect letter\n");
                     printf("Lives remaining: %d\n", MAX_LIVES - *num_incorrect_guesses);
