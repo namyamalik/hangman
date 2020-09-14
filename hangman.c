@@ -38,9 +38,9 @@ char* normalize_word(char* word);
  */
 int main(int argc, char* argv[]) 
 {
-	validate_arguments(argc, argv); // check command-line arguments before game begins
-	hangman(argc, argv);
-	return 0;
+    validate_arguments(argc, argv); // check command-line arguments before game begins
+    hangman(argc, argv);
+    return 0;
 }	
 
 
@@ -52,35 +52,35 @@ int main(int argc, char* argv[])
  */
 void hangman(int argc, char* argv[]) 
 {
-	assert(argc >= 0);
+    assert(argc >= 0);
     assert(argv != NULL);
 
-	// randomly choose word from txt file
-	char* word_chosen = choose_word(argv);
-	#ifdef UNITTESTING
-		printf("word chosen is %s\n", word_chosen);	
-	#endif
+    // randomly choose word from txt file
+    char* word_chosen = choose_word(argv);
+    #ifdef UNITTESTING
+	    printf("word chosen is %s\n", word_chosen);	
+    #endif
 
-	// print dashes & return array of zeros corresponding to length of word chosen	
-	int* zeros_array = print_before_guess(word_chosen);
+    // print dashes & return array of zeros corresponding to length of word chosen	
+    int* zeros_array = print_before_guess(word_chosen);
 	
-	// variables that get updated on each run of player_guess
-	bool solved = false;
-	int num_incorrect_guesses = 0;
-	char incorrect_letters_array[26] = " "; // to store incorrect guesses, 26 letters in alphabet, must initialize to avoid valgrind errors
+    // variables that get updated on each run of player_guess
+    bool solved = false;
+    int num_incorrect_guesses = 0;
+    char incorrect_letters_array[26] = " "; // to store incorrect guesses, 26 letters in alphabet, must initialize to avoid valgrind errors
 	
-	// let user guess again while word remains unsolved and lives remain
-	while (!solved && num_incorrect_guesses < MAX_LIVES) {
+    // let user guess again while word remains unsolved and lives remain
+    while (!solved && num_incorrect_guesses < MAX_LIVES) {
 		player_guess(word_chosen, zeros_array, &solved, &num_incorrect_guesses, incorrect_letters_array);
 	}
 
-	#ifdef UNITTESTING
+    #ifdef UNITTESTING
         printf("\ngame finished\n");
     #endif
 	
-	// free variables that were needed until the end of program	
-	free(word_chosen);
-	free(zeros_array);
+    // free variables that were needed until the end of program	
+    free(word_chosen);
+    free(zeros_array);
 }
 
 
