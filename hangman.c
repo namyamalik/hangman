@@ -13,6 +13,7 @@
 #include <ctype.h>
 #include <time.h>
 #include <stdbool.h>
+#include <assert.h>
 
 /**************** constants ****************/
 const int MAX_LIVES = 5;
@@ -51,6 +52,9 @@ int main(int argc, char* argv[])
  */
 void hangman(int argc, char* argv[]) 
 {
+	assert(argc >= 0);
+    assert(argv != NULL);
+
 	// randomly choose word from txt file
 	char* word_chosen = choose_word(argv);
 	#ifdef UNITTESTING
@@ -88,6 +92,9 @@ void hangman(int argc, char* argv[])
  */
 void validate_arguments(int argc, char* argv[]) 
 {
+	assert(argc >= 0);
+	assert(argv != NULL);
+
 	// if user provides incorrect number of  arguments
     if (argc != 2) {
         fprintf(stderr, "Error: incorrect number of arguments provided - please provide 1 argument for correct usage\n");
@@ -112,6 +119,8 @@ void validate_arguments(int argc, char* argv[])
  */
 char* choose_word(char* argv[]) 
 {
+    assert(argv != NULL);
+
 	char word[200]; // store each character of a word (max 200 letters in word)
 	char* word_array[1000]; // store each word (max 1000 in file)
 	int num_words = 0;
@@ -162,6 +171,8 @@ char* choose_word(char* argv[])
  */
 int* print_before_guess(char* word_chosen) 
 {
+    assert(word_chosen != NULL);
+
 	// print word but with all the letters replaced with dashes
 	printf("\nWord: ");
 	for (int i = 0; i < strlen(word_chosen); i++) {
@@ -187,6 +198,12 @@ int* print_before_guess(char* word_chosen)
  */
 void player_guess(char* word_chosen, int* zeros_array, bool* solved, int* num_incorrect_guesses, char incorrect_letters_array[]) 
 {
+	assert(word_chosen != NULL);
+    assert(zeros_array != NULL);
+	assert(solved != NULL);
+	assert(num_incorrect_guesses != NULL);
+	assert(incorrect_letters_array != NULL);	
+
 	char character[200] = " "; // to store user input, initialize to avoid valgrind errors
 
 	// let user enter a guess and read from stdin
@@ -264,18 +281,21 @@ void player_guess(char* word_chosen, int* zeros_array, bool* solved, int* num_in
  */
 void print_word_filled(char* word_chosen, int* zeros_array) 
 {
-		printf("\nWord: ");
-		for (int i = 0; i < strlen(word_chosen); i++) {
-			// print a dash if letter has not been guessed 
-			if (zeros_array[i] == 0) {
-				printf("_ ");
-			}
-			// print the letter if it has been guessed
-			else {
-				printf("%c ", word_chosen[i]);
-			}
+	assert(word_chosen != NULL);
+    assert(zeros_array != NULL);
+
+	printf("\nWord: ");
+	for (int i = 0; i < strlen(word_chosen); i++) {
+		// print a dash if letter has not been guessed 
+		if (zeros_array[i] == 0) {
+			printf("_ ");
 		}
-		printf("\n");
+		// print the letter if it has been guessed
+		else {
+			printf("%c ", word_chosen[i]);
+		}
+	}
+	printf("\n");
 }
 
 
@@ -287,6 +307,10 @@ void print_word_filled(char* word_chosen, int* zeros_array)
  */
 void check_solved(char* word_chosen, int* zeros_array, bool* solved) 
 {
+	assert(word_chosen != NULL);
+    assert(zeros_array != NULL);
+    assert(solved != NULL);
+
 	for (int i = 0; i < strlen(word_chosen); i++) {
 		// if zeros_array contains zero then word has not been solved
 		if (zeros_array[i] == 0) {
@@ -308,6 +332,9 @@ void check_solved(char* word_chosen, int* zeros_array, bool* solved)
  */
 bool validate_user_guess(char character[], bool* solved) 
 {
+	assert(character != NULL);
+    assert(solved != NULL);
+
 	// normalize the entry to lowercase (in case user provided uppercase letter)
 	char* word_normalized = normalize_word(character);
 
@@ -341,6 +368,8 @@ bool validate_user_guess(char character[], bool* solved)
  */
 char* normalize_word(char* word) 
 {
+	assert(word != NULL);
+
 	for (int i = 0; i < strlen(word); i++) {
         if (word[i] >= 65 && word[i] <= 90) {
             word[i] = word[i] + 32;
