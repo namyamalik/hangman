@@ -201,8 +201,8 @@ void player_guess(char* word_chosen, int* zeros_array, bool* solved, int* num_in
     assert(word_chosen != NULL);
     assert(zeros_array != NULL);
     assert(solved != NULL);
-	assert(num_incorrect_guesses != NULL);
-	assert(incorrect_letters_array != NULL);	
+    assert(num_incorrect_guesses != NULL);
+    assert(incorrect_letters_array != NULL);	
 
     char character[200] = " "; // to store user input, initialize to avoid valgrind errors
 
@@ -221,17 +221,17 @@ void player_guess(char* word_chosen, int* zeros_array, bool* solved, int* num_in
 	    bool letter_filled_in = false;
 	    bool letter_incorrect_again = false;
 
-	    // check if user's guess matches a letter in the chosen word
-	    for (int i = 0; i < strlen(word_chosen); i++) {
-		    if (character[0] == word_chosen[i]) { // compare characters
-			    if (zeros_array[i] == 0) { // change corresponding array element from 0 to 1 to denote that letter has been guessed
-			        zeros_array[i] = 1;
-				    letter_success = true;
-			    }
-			    // correct letter had already been guessed and filled in
-			    else if (zeros_array[i] == 1) {
-				    letter_filled_in = true;
-			    }
+        // check if user's guess matches a letter in the chosen word
+       for (int i = 0; i < strlen(word_chosen); i++) {
+		   if (character[0] == word_chosen[i]) { // compare characters
+			   if (zeros_array[i] == 0) { // change corresponding array element from 0 to 1 to denote that letter has been guessed
+				   zeros_array[i] = 1;
+				   letter_success = true;
+			   }
+			   // correct letter had already been guessed and filled in
+			   else if (zeros_array[i] == 1) {
+				   letter_filled_in = true;
+			   }
 		    }
 	    }
 	
@@ -245,7 +245,7 @@ void player_guess(char* word_chosen, int* zeros_array, bool* solved, int* num_in
             printf("Lives remaining: %d\n", MAX_LIVES - *num_incorrect_guesses);
         }
         else {
-		    // check incorrect_letters_array to see if incorrect guess had been repeated before
+			// check incorrect_letters_array to see if incorrect guess had been repeated before
             for (int i = 0; i < strlen(incorrect_letters_array); i++) {
 			    if (incorrect_letters_array[i] == character[0]) {
                     printf("You already guessed this incorrect letter\n");
@@ -264,9 +264,9 @@ void player_guess(char* word_chosen, int* zeros_array, bool* solved, int* num_in
 		
 	    // if lives remain then print updated word and check if it has been solved
 	    if (*num_incorrect_guesses < MAX_LIVES) {
-		    print_word_filled(word_chosen, zeros_array);
-		    check_solved(word_chosen, zeros_array, solved);
-		    return;
+            print_word_filled(word_chosen, zeros_array);
+			check_solved(word_chosen, zeros_array, solved);
+			return;
 	    }
 	    printf("\nGame Over. You ran out of lives. The word was '%s'.\n\n", word_chosen); // no lives remain
     }
